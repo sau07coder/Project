@@ -1,0 +1,21 @@
+cookie_demo.php 
+<?php 
+$cookie_name="username"; 
+if (isset($_POST['set'])) { 
+setcookie($cookie_name, $_POST['username']); 
+echo "<script>alert('Cookie is set')</script>"; 
+} 
+if (isset($_POST['get'])) { 
+if ($_COOKIE[$cookie_name] != "") { 
+echo "<h2>Welcome ". $_COOKIE[$cookie_name] . "</h2>"; 
+} else { 
+echo "<script>alert('Cookie is not set')</script>"; 
+} 
+} 
+?> 
+<html> 
+<body> 
+<form method="post"> 
+Name <input type="text" name="username"><br> 
+<input type="submit" name="set" value="Set"> 
+<input type="submit" name="get" value="Get">

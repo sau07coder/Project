@@ -1,0 +1,53 @@
+logindemo.php 
+<?php 
+session_start(); 
+if (isset($_POST["btnlogin"])) { 
+$user = $_POST["username"]; 
+$pass = $_POST["password"]; 
+if ($user == "" || $pass == "") { 
+echo "<script>alert('Username or Password cannot be empty');</script>"; 
+} 
+else if ($user == "Admin" && $pass == "admin123") { 
+$_SESSION['username'] = $user; 
+$_SESSION['password'] = $pass; 
+header("Location: Welcome.php"); 
+exit;  
+}  
+else  
+{ 
+echo "<script>alert('Invalid Username or Password');</script>"; 
+} 
+} 
+?> 
+<html> 
+<head> 
+</head> 
+<body> 
+
+
+<form method="post"> 
+UserName: <input type="text" name="username"> <br><br> 
+Password: <input type="password" name="password"> <br><br> 
+<input type="submit" name="btnlogin" value="Login">  
+</form> 
+</body> 
+</html> 
+welcome.php 
+<?php 
+session_start(); 
+echo "<h1>Welcome, " . $_SESSION['username'] . "</h1>"; 
+?> 
+<html> 
+<head> 
+</head> 
+<body> 
+<a href="logout.php">Logout</a> 
+</body> 
+</html> 
+logout.php 
+<?php 
+session_start(); 
+session_unset(); 
+session_destroy(); 
+header("Location:logindemo.php"); 
+?> 

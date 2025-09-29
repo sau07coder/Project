@@ -1,0 +1,58 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>Word Counter from File</title> 
+</head> 
+<body> 
+<h2>Word Counter & Word Search</h2> 
+<form method="get"> 
+<label>Enter word to search:</label> 
+<input type="text" name="searchWord" required><br><br> 
+<input type="submit" name="read" value="Read File & Count Words"> 
+<input type="submit" name="check" value="Check Word in File"> 
+</form> 
+<?php 
+$filename = "sample.txt"; 
+if (isset($_GET['read']))  
+{ 
+if (file_exists($filename))  
+{ 
+$file = fopen($filename, "r") or die("Unable to open file"); 
+$text = fread($file, filesize($filename)); 
+fclose($file); 
+$wordCount = str_word_count($text); 
+echo "<hr>"; 
+echo "Text from file:<br><pre>$text</pre>"; 
+echo "Total number of words: <strong>$wordCount</strong><br>"; 
+}  
+else  
+{ 
+echo "File '$filename' does not exist."; 
+} 
+} 
+if (isset($_GET['check']) && !empty($_GET['searchWord'])) { 
+$searchWord = $_GET['searchWord']; 
+if (file_exists($filename)) { 
+$file = fopen($filename, "r") or die("Unable to open file"); 
+$text = fread($file, filesize($filename)); 
+fclose($file); 
+echo "<hr>"; 
+if (stripos($text, $searchWord) !== false)  
+{ 
+echo "The word '<strong>$searchWord</strong>' is <span style='color:green;'>present</span> 
+in the file."; 
+}  
+else  
+{ 
+echo "The word '<strong>$searchWord</strong>' is <span style='color:red;'>NOT 
+present</span> in the file."; 
+} 
+}  
+else  
+{ 
+echo "File '$filename' does not exist."; 
+} 
+} 
+?> 
+</body> 
+</html>

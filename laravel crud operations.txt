@@ -1,0 +1,177 @@
+app\Http\Controllers\StudentController.php: 
+<?php 
+ 
+namespace App\Http\Controllers; 
+ 
+use App\Models\Student; 
+use Illuminate\Http\Request; 
+ 
+class StudentController extends Controller 
+{ 
+    public function index() 
+    { 
+        $students = Student::all(); 
+        return view('students.index', compact('students')); 
+    } 
+ 
+    public function create() 
+    { 
+        return view('students.create'); 
+    } 
+ 
+    public function store(Request $request) 
+    { 
+        $request->validate([ 
+            'name' => 'required', 
+            'email' => 'required|email|unique:students', 
+        ]); 
+ 
+        Student::create($request->all());  
+        return redirect()->route('students.index')->with('success', 'Student added successfully'); 
+    } 
+ 
+    public function show($id) 
+    { 
+ 
+    } 
+ 
+    public function edit(Student $student) 
+    { 
+        return view('students.edit', compact('student'));  
+    } 
+ 
+    public function update(Request $request, Student $student) 
+    { 
+        $request->validate([ 
+            'name' => 'required', 
+            'email' => 'required|email|unique:students,email,' . $student->id, 
+        ]); 
+ 
+        $student->update($request->all()); 
+ 
+        return redirect()->route('students.index')->with('success', 'Student updated successfully'); 
+    } 
+ 
+    public function destroy(Student $student) 
+    { 
+        $student->delete(); 
+ 
+        return redirect()->route('students.index')->with('success', 'Student deleted successfully'); 
+    } 
+} 
+ 
+ 
+app\Models\Student.php 
+<?php 
+ 
+namespace App\Models; 
+ 
+use Illuminate\Database\Eloquent\Factories\HasFactory; 
+use Illuminate\Database\Eloquent\Model; 
+ 
+class Student extends Model 
+{ 
+    use HasFactory; 
+    public $timestamps = false; 
+    protected $fillable = [ 
+        'name', 
+        'email', 
+        'phone', 
+        'address', 
+    ]; 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+resources\views\students\create.blade.php 
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>Add Student</title> 
+</head> 
+<body> 
+    <h1>Add Student</h1> 
+    <form action="{{ route('students.store') }}" method="POST"> 
+        @csrf 
+        Name: <input type="text" name="name"><br><br> 
+        Email: <input type="email" name="email"><br><br> 
+        <button type="submit">Save</button> 
+    </form> 
+</body> 
+</html> 
+ 
+ 
+resources\views\students\edit.blade.php 
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>Edit Student</title> 
+</head> 
+<body> 
+    <h1>Edit Student</h1> 
+    <form action="{{ route('students.update', $student->id) }}" method="POST"> 
+        @csrf 
+        @method('PUT') 
+        Name: <input type="text" name="name" value="{{ $student->name }}"><br><br> 
+        Email: <input type="email" name="email" value="{{ $student->email }}"><br><br> 
+        <button type="submit">Update</button> 
+    </form> 
+</body> 
+</html> 
+ 
+resources\views\students\index.blade.php 
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <title>Students CRUD</title> 
+</head> 
+<body> 
+    <a href="{{ route('students.create') }}">Add Student</a> 
+    <br><br> 
+ 
+    @if(session('success')) 
+    <p style="color:green;">{{session('success')}}</p> 
+    @endif 
+ 
+    <table border="1" cellpadding="5"> 
+        <tr> 
+            <th>ID</th>Name</th><th>Email</th><th>Actions</th> 
+        </tr> 
+        @foreach ($students as $student) 
+        <tr> 
+            <td>{{ $student->id}}</td> 
+            <td>{{ $student->name}}</td> 
+            <td>{{ $student->email}}</td> 
+            <td> 
+                <a href="{{ route('students.edit', $student->id) }}">Edit</a> | 
+                    <form action="{{ route('students.destroy', $student->id) }}" method="POST" 
+style="display:inline;"> 
+                        @csrf 
+                        @method('DELETE') 
+                        <button type="submit" onclick="return confirm('Delete this 
+student?')">Delete</button> 
+                    </form> 
+                </td> 
+            </tr> 
+        @endforeach 
+ 
+    </table> 
+</body> 
+</html> 
+ 
+ 
+ 
+ 
+routes\web.php 
+<?php 
+use App\Http\Controllers\StudentController; 
+use Illuminate\Support\Facades\Route; 
+ 
+Route::get('/', function () { 
+    return view('welcome'); 
+}); 
+ 
+Route::resource('students', StudentController::class);

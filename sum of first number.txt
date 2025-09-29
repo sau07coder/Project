@@ -1,0 +1,16 @@
+<html> 
+<head> 
+<title>PHP Program to Print Sum of First N Numbers</title> 
+</head> 
+<body> 
+<form method="post"> 
+Enter value of N: <input type="number" name="n"> 
+<input type="submit" value="Calculate Sum"> 
+</form> 
+<?php 
+if ($_POST) { 
+$n = $_POST['n']; 
+$sum = $n * ($n + 1) / 2; 
+echo "Sum of first $n natural numbers is $sum"; 
+} 
+?>

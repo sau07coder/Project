@@ -1,0 +1,91 @@
+userinfo.blade.php 
+<!doctype html> 
+<html> 
+<head> 
+    <title>BMI Calculator - BMI_APP</title> 
+</head> 
+<body> 
+    <h2>Enter Your Details</h2> 
+ 
+    @if ($errors->any()) 
+        <div style="color: red;"> 
+            <ul> 
+                @foreach ($errors->all() as $error) 
+                    <li>{{ $error }}</li> 
+                @endforeach 
+            </ul> 
+        </div> 
+    @endif 
+ 
+    <form method="POST" action="{{ route('calculate') }}"> 
+        @csrf 
+        <label>Weight (kg):</label> 
+        <input type="number" name="weight" required step="0.1" min="1"><br><br> 
+ 
+        <label>Height (cm):</label> 
+        <input type="number" name="height" required step="0.1" min="1"><br><br> 
+ 
+
+<button type="submit">Calculate BMI</button> 
+</form> 
+</body> 
+</html>
+
+
+BMICONTROLLER.php 
+<?php 
+ 
+namespace App\Http\Controllers; 
+use Illuminate\Http\Request; 
+class BMICONTROLLER extends Controller 
+{ 
+    public function calBMI(Request $req) 
+    { 
+        $req->validate([ 
+            'weight' => 'required|numeric|min:1', 
+            'height' => 'required|numeric|min:1', 
+        ]); 
+ 
+        $weight = $req->input('weight'); 
+        $height = $req->input('height') / 100; 
+        $bmi = $weight / ($height * $height); 
+ 
+        if ($bmi < 18.5) { 
+            $result = "underweight"; 
+            $image = "underweight.png"; 
+        } elseif ($bmi >= 18.5 && $bmi < 24.9) { 
+            $result = "healthy"; 
+            $image = "healthy.png"; 
+        } else { 
+            $result = "overweight"; 
+            $image = "overweight.png"; 
+        } 
+ 
+        return view('result', compact('bmi', 'result', 'image')); 
+    } 
+} 
+ 
+Result.blade.php: 
+<!doctype html> 
+<html> 
+<head> 
+    <title>BMI Result - BMI_APP</title> 
+</head> 
+<body> 
+    <h2>Your BMI Result </h2> 
+ 
+    <p><strong>BMI:</strong> {{ number_format($bmi, 2) }}</p> 
+<p><strong>Status:</strong> {{ ucfirst($result) }}</p> 
+<img src="{{ asset('images/' . $image) }}" alt="{{ $result }}" width="250"> 
+<br><br> 
+<a href="/bmi">Calculate Again</a> 
+</body> 
+</html> 
+Web.php: 
+<?php 
+use Illuminate\Support\Facades\Route; 
+use App\Http\Controllers\BMICONTROLLER; 
+Route::get('/bmi', function () { 
+return view('userinfo'); 
+}); 
+Route::post('/calculatebmi', [BMICONTROLLER::class, 'calBMI'])->name('calculate');

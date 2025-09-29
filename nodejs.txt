@@ -1,0 +1,30 @@
+app.js 
+function sayHello(name) 
+{ 
+console.log("Hello "+name); 
+} 
+sayHello("xyz"); 
+
+
+Server1.js 
+const http = require("http"); 
+const server = http.createServer((req, res) => { 
+    res.writeHead(200, { "Content-Type": "text/plain" }); 
+    res.end("Hello, TYBsc Student! Welcome to Node.js"); 
+}); 
+server.listen(3000, () => { 
+    console.log("Server running at http://localhost:3000/"); 
+}); 
+
+
+server2.js 
+const http = require("http");    
+const server = http.createServer((req, res) => { 
+res.writeHead(200, { "Content-Type": "text/html" }); 
+res.write("<h1>Hello, TYBsc Student! Welcome to Node.js</h1>"); 
+res.write("<p>This is an HTML response.</p>"); 
+res.end(); 
+}); 
+server.listen(4000, () => { 
+console.log("Server running at http://localhost:4000/"); 
+});

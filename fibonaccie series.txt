@@ -1,0 +1,25 @@
+<html> 
+<head> 
+    <title>Program to Display Fibonacci Series</title> 
+</head> 
+<body> 
+<form method="post"> 
+    Enter how many terms: <input type="number" name="terms"> 
+    <input type="submit" value="Generate Series"> 
+</form> 
+ 
+<?php 
+if ($_POST) { 
+    $terms = $_POST['terms']; 
+    $a = 0; 
+    $b = 1; 
+ 
+    echo "Fibonacci Series: "; 
+    for ($i = 0; $i < $terms; $i++) { 
+        echo $a . " "; 
+        $next = $a + $b; 
+        $a = $b; 
+        $b = $next; 
+    } 
+} 
+?> 

@@ -1,0 +1,33 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>Employee Details Form</title> 
+</head> 
+<body> 
+    <h2>Enter Employee Details</h2> 
+    <form method="post"> 
+        Employee ID: <input type="text" name="eid" required><br><br> 
+        Name: <input type="text" name="name" required><br><br> 
+        City: <input type="text" name="city" required><br><br> 
+        Salary: <input type="number" name="salary" required><br><br> 
+        <input type="submit" name="submit" value="Add Employee"> 
+    </form> 
+ 
+<?php 
+if (isset($_POST['submit'])) { 
+    $eid = $_POST['eid']; 
+    $name = $_POST['name']; 
+    $city = $_POST['city']; 
+    $salary = $_POST['salary']; 
+ 
+    $data = "EID: $eid | Name: $name | City: $city | Salary: $salary\n"; 
+ 
+    $file = fopen("employees.txt", "a") or die("Unable to open file!"); 
+    fwrite($file, $data); 
+    fclose($file); 
+ 
+    echo "<p style='color:green;'>Employee details added successfully!</p>"; 
+} 
+?> 
+</body> 
+</html>

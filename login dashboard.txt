@@ -1,0 +1,232 @@
+Wt/Index.html 
+ 
+<!DOCTYPE html> 
+<html> 
+<body> 
+<h2>Dashboard</h2> 
+<form action="page.php" method="post"> 
+    <button type="submit" name="login">Login Page</button> 
+    <br><br> 
+    <button type="submit" name="register">Registration Page</button> 
+    <br><br> 
+    <button type="submit" name="ch_pass">Change Password Page</button> 
+</form> 
+</body> 
+</html> 
+ 
+Wt/Page.php 
+ 
+<?php 
+if ($_SERVER['REQUEST_METHOD'] === "POST") { 
+    if (isset($_POST['login'])) { 
+        include('login.html'); 
+    } 
+    if (isset($_POST['register'])) { 
+        include('register.html'); 
+    } 
+    if (isset($_POST['ch_pass'])) { 
+        include('changepass.html'); 
+    } 
+} 
+?> 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Wt/Register.html 
+ 
+<!DOCTYPE html> 
+<html> 
+<body> 
+<h1>Registration Page</h1> 
+<form action="backend/register.php" method="post"> 
+    <label for="eid">Id : </label> 
+    <input type="number" required name="eid"><br><br> 
+ 
+    <label for="fname">First Name : </label> 
+    <input type="text" name="fname" required><br><br> 
+ 
+    <label for="lname">Last Name : </label> 
+    <input type="text" name="lname" required><br><br> 
+ 
+    <label for="username">Username : </label> 
+    <input type="text" name="username" required><br><br> 
+ 
+    <label for="password">Password : </label> 
+    <input type="password" required name="password"><br><br> 
+ 
+    <button type="submit" name="register">Register</button> 
+</form> 
+</body> 
+</html> 
+ 
+Wt/Login.html 
+ 
+<!DOCTYPE html> 
+<html> 
+<body> 
+<h1>Login Page</h1> 
+<form action="backend/login.php" method="post"> 
+    <label for="username">Username : </label> 
+    <input type="text" name="username" required><br><br> 
+ 
+    <label for="password">Password : </label> 
+    <input type="password" required name="password"><br><br> 
+ 
+    <button type="submit" name="login">Login</button> 
+</form> 
+</body> 
+</html> 
+ 
+ 
+Wt/Changepass.html 
+ 
+<!DOCTYPE html> 
+<html> 
+<body> 
+<h2>Change Password</h2> 
+<form action="backend/changepass.php" method="post"> 
+    <label for="username">Username : </label> 
+    <input type="text" name="username" required><br><br> 
+ 
+    <label for="new_password">New Password : </label> 
+    <input type="password" required name="new_password"><br><br> 
+ 
+    <label for="con_password">Confirm Password : </label> 
+    <input type="password" required name="con_password"><br><br> 
+ 
+    <button type="submit" name="ch_pass">Change Password</button> 
+</form> 
+</body> 
+</html> 
+ 
+Wt/backend/Db.php 
+ 
+<?php 
+$db_server = "localhost"; 
+$db_user   = "root"; 
+$db_pass   = "";  
+$db_name   = "emp"; 
+$conn = ""; 
+ 
+try { 
+     
+    $conn = mysqli_connect($db_server, $db_user, $db_pass, $db_name,); 
+} catch (mysqli_sql_exception) { 
+    die("Connection failed: " . mysqli_connect_error()); 
+} 
+?> 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Wt/backend/Register.php 
+ 
+<?php 
+include("db.php"); 
+ 
+if ($_SERVER["REQUEST_METHOD"] === "POST") { 
+    if (isset($_POST['register'])) { 
+        $eid      = mysqli_real_escape_string($conn, $_POST['eid']); 
+        $fname    = mysqli_real_escape_string($conn, $_POST['fname']); 
+        $lname    = mysqli_real_escape_string($conn, $_POST['lname']); 
+        $username = mysqli_real_escape_string($conn, $_POST['username']); 
+        $password = $_POST['password']; // This will store the password as plain text 
+ 
+        $sql = "INSERT INTO empdet (eid, fname, lname, username, password)  
+                VALUES ('$eid', '$fname', '$lname', '$username', '$password')"; 
+ 
+        if (mysqli_query($conn, $sql)) { 
+            header("Location: ../home.php"); 
+            exit; 
+        } else { 
+            echo "Error: " . mysqli_error($conn); 
+        } 
+    } 
+} 
+mysqli_close($conn); 
+?> 
+ 
+Wt/backend/Login.php 
+ 
+<?php 
+include("db.php"); 
+ 
+if ($_SERVER["REQUEST_METHOD"] === "POST") { 
+    if (isset($_POST['login'])) { 
+        $username = mysqli_real_escape_string($conn, $_POST['username']); 
+        $password = $_POST['password']; 
+ 
+        $sql = "SELECT * FROM empdet WHERE username='$username'"; 
+        $result = mysqli_query($conn, $sql); 
+ 
+        if (mysqli_num_rows($result) > 0) { 
+            $row = mysqli_fetch_assoc($result); 
+ 
+            if ($password === $row['password']) { 
+                header("Location: ../home.php"); 
+                exit; 
+            } else { 
+                echo "<script>alert('Incorrect Password');</script>"; 
+            } 
+        } else { 
+            echo "<script>alert('Username does not exist');</script>"; 
+        } 
+    } 
+} 
+mysqli_close($conn); 
+?> 
+ 
+Wt/backend/Changepass.php 
+ 
+<?php 
+include("db.php"); 
+ 
+if ($_SERVER["REQUEST_METHOD"] === "POST") { 
+    if (isset($_POST['ch_pass'])) { 
+        $username     = $_POST['username']; 
+        $new_password = $_POST['new_password']; 
+        $con_password = $_POST['con_password']; 
+ 
+        if ($new_password !== $con_password) { 
+            echo "<script>alert('Passwords do not match'); window.history.back();</script>"; 
+        } else { 
+            $sql = "UPDATE empdet SET password = ? WHERE username = ?"; 
+            $stmt = mysqli_prepare($conn, $sql); 
+ 
+            mysqli_stmt_bind_param($stmt, "ss", $new_password, $username); 
+ 
+            if (mysqli_stmt_execute($stmt)) { 
+                if (mysqli_stmt_affected_rows($stmt) > 0) { 
+                    echo "<script>alert('Password changed successfully'); window.location.href = 
+'../login.html';</script>"; 
+                } else { 
+                    echo "<script>alert('Username does not exist or password is the same.'); 
+window.history.back();</script>"; 
+                } 
+            } else { 
+                echo "<script>alert('Error updating password.'); window.history.back();</script>"; 
+            } 
+        } 
+    } 
+} 
+mysqli_close($conn); 
+?>  
+Wt/Home.php 
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="UTF-8"> 
+<title>Home</title> 
+</head> 
+<body> 
+<h1>Home Page</h1> 
+</body> 
+</html>

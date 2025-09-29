@@ -1,0 +1,105 @@
+Create new folder – hello-node in Vs Code  
+In cmd first open your hello-node folder  
+Then run this command in cmd- npm install express 
+
+
+index.html 
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="UTF-8" /> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+<title>Bank Account</title> 
+</head> 
+<body> 
+<h3></h3> 
+<h1>Bank Account</h1> 
+<p>Balance: <span id="balance">0</span></p> 
+<input type="number" id="amount" placeholder="Enter amount" /> 
+<button id="creditBtn">Credit</button> 
+<button id="debitBtn">Debit</button> 
+  <script> 
+    const balanceSpan = document.getElementById('balance'); 
+    const amountInput = document.getElementById('amount'); 
+    const creditBtn = document.getElementById('creditBtn'); 
+    const debitBtn = document.getElementById('debitBtn'); 
+ 
+    function updateBalance(newBalance) { 
+      balanceSpan.textContent = newBalance; 
+    } 
+ 
+    creditBtn.addEventListener('click', () => { 
+      const amount = parseFloat(amountInput.value); 
+      if (isNaN(amount) || amount <= 0) { 
+        alert('Please enter a valid amount greater than 0'); 
+        return; 
+      } 
+ 
+      fetch('/credit', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ amount }), 
+      }) 
+        .then((res) => res.json()) 
+        .then((data) => { 
+          updateBalance(data.balance); 
+          amountInput.value = ''; 
+        }) 
+        .catch((err) => { 
+          alert('Error crediting amount'); 
+          console.error(err); 
+        }); 
+    }); 
+ 
+    debitBtn.addEventListener('click', () => { 
+      const amount = parseFloat(amountInput.value); 
+      if (isNaN(amount) || amount <= 0) { 
+        alert('Please enter a valid amount greater than 0'); 
+        return; 
+      } 
+ 
+      fetch('/debit', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ amount }), 
+      }) 
+        .then((res) => res.json()) 
+        .then((data) => { 
+          if (data.error) { 
+            alert(data.error); 
+          } else { 
+            updateBalance(data.balance); 
+            amountInput.value = ''; 
+          } 
+        }) 
+        .catch((err) => { 
+          alert('Error debiting amount'); 
+          console.error(err); 
+        }); 
+    }); 
+  </script> 
+</body> 
+</html> 
+ 
+server2.js 
+const express = require('express'); 
+const app = express(); 
+let balance = 0; 
+ 
+app.use(express.json()); 
+app.use(express.static('.')); 
+ 
+app.post('/credit', (req, res) => { 
+    balance += req.body.amount; 
+    res.json({ balance }); 
+}); 
+ 
+app.post('/debit', (req, res) => { 
+    if (req.body.amount > balance) { 
+        return res.json({ balance, error: 'Insufficient balance!' }); 
+    } 
+    balance -= req.body.amount; 
+    res.json({ balance }); 
+}); 
+ 
+app.listen(3000, () => console.log('Server running at http://localhost:3000'));

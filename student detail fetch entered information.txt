@@ -1,0 +1,33 @@
+student_form.php 
+ 
+<html> 
+<head> 
+    <title>Student Details and Display on Another Page</title> 
+</head> 
+<body> 
+ 
+<form method="post" action="student_display.php"> 
+    First Name: <input type="text" name="first_name"><br> 
+    Last Name: <input type="text" name="last_name"><br> 
+    Date of Birth: <input type="date" name="dob"><br> 
+    Address: <textarea name="address"></textarea><br> 
+    Subject: <input type="text" name="subject"><br> 
+    Marks: <input type="number" name="marks"><br> 
+    Percentage: <input type="text" name="percentage"><br> 
+    <input type="submit" value="Submit"> 
+</form> 
+ 
+student_display.php 
+ 
+<!-- student_display.php --> 
+<?php 
+if ($_POST) { 
+    echo "<h2>Student Information</h2>"; 
+    echo "Name: " . $_POST['first_name'] . " " . $_POST['last_name'] . "<br>"; 
+    echo "Date of Birth: " . $_POST['dob'] . "<br>"; 
+    echo "Address: " . $_POST['address'] . "<br>"; 
+    echo "Subject: " . $_POST['subject'] . "<br>"; 
+    echo "Marks: " . $_POST['marks'] . "<br>"; 
+    echo "Percentage: " . $_POST['percentage'] . "%<br>"; 
+} 
+?>
